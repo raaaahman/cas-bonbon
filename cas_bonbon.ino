@@ -9,6 +9,8 @@ int PADDLE_HEIGHT = 3;
 int BRICK_WIDTH = 8;
 int BRICK_HEIGHT = 4;
 const int GRID_WIDTH = 8;
+const int GRID_HEIGHT = 6;
+const int LEVEL_MAX = 2;
 int screen = 0;
 const int SCREEN_MENU = 0;
 const int SCREEN_GAME = 1;
@@ -24,18 +26,38 @@ bool ballLaunched;
 int padPosX;
 int padPosY;
 
-int bricks[GRID_WIDTH];
+int bricks[GRID_HEIGHT][GRID_WIDTH];
 
+int levels[LEVEL_MAX][GRID_HEIGHT][GRID_WIDTH] = {
+  { // Level 1
+    { 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 1, 1, 1, 1, 1, 1, 1, 1 },
+    { 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0 }
+  },
+  { // Level 2
+    { 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 1, 1, 1, 1, 1, 1, 1, 1 },
+    { 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 1, 1, 1, 1, 1, 1, 1, 1 }
+  }
+};
 
 void setLevel( int levelNb ) {
+  for ( int lineNb = 0; lineNb < GRID_HEIGHT; lineNb++ ) {
     for ( int brickNb = 0; brickNb < GRID_WIDTH; brickNb++) {
-      bricks[brickNb] = 1;
+      bricks[lineNb][brickNb] = levels[levelNb][lineNb][brickNb];
     }
+  } 
 }
 
 void resetGame() {
   lives = 3;
-  currentLevel = 1;
+  currentLevel = 0;
 }
 
 void resetBall() {
@@ -106,7 +128,7 @@ void runGame() {
   gb.display.setFontSize(1);
   gb.display.printf( "Lives %i", lives);
   gb.display.setCursorX( 40 );
-  gb.display.printf( "Level %i", currentLevel);
+  gb.display.printf( "Level %i", currentLevel + 1);
   // THE PADDLE
   if (gb.buttons.pressed(BUTTON_RIGHT)) {  // If we press RIGHT
     padPosX = padPosX + 8;    // Add 4 to "counter"
@@ -175,35 +197,49 @@ void runGame() {
 
    //THE BRICKS
    bool remaining = false;
-  for ( int i = 0; i < GRID_WIDTH; i++ ) {
-    int brickX =  1 + i * ( 2 + BRICK_WIDTH );
-    int brickY = 20;
-    
-    if ( bricks[i] == 1 ) {
-      switch ( checkCollision( brickX, brickY, BRICK_WIDTH, BRICK_HEIGHT ) ) {
-        case 'A' :
-        case 'U' : 
-          speedY = -speedY;
-          bricks[i] = 0;
-          break;
-        case 'L' :
-        case 'R' :
-          speedX = -speedX;
-          bricks[i] = 0;
-          break;
-      }
-    }
-    
-    if ( bricks[i] == 1 ) {
+   for ( int lineNb = 0; lineNb < GRID_HEIGHT; lineNb++ ) {
+      for ( int brickNb = 0; brickNb < GRID_WIDTH; brickNb++ ) {
+      int brickX =  1 + brickNb * ( 2 + BRICK_WIDTH );
+      int brickY = GUI_HEIGHT + lineNb * ( 2 + BRICK_HEIGHT );
+      
+      if ( bricks[lineNb][brickNb] == 1 ) {
+        switch ( checkCollision( brickX, brickY, BRICK_WIDTH, BRICK_HEIGHT ) ) {
+          case 'A' :
+          case 'U' : 
+            speedY = -speedY;
+            bricks[lineNb][brickNb] = 0;
+            break;
+          case 'L' :
+          case 'R' :
+            speedX = -speedX;
+            bricks[lineNb][brickNb] = 0;
+            break;
+        }
+     }
+
+     if ( bricks[lineNb][brickNb] == 1 ) {
       remaining = true;
       gb.display.setColor(PINK);
       gb.display.fillRoundRect( brickX, brickY, BRICK_WIDTH, BRICK_HEIGHT, BRICK_HEIGHT / 2 );
     }
+    
+    }
   }
 
   if ( remaining == false ) {
-    setLevel( currentLevel++ );
-    resetBall();
+    if ( currentLevel + 1 < LEVEL_MAX ) {
+      setLevel( ++currentLevel );
+      resetBall();
+    }
+    
+  }
+
+  // Only for development
+  if ( gb.buttons.pressed(BUTTON_MENU) ) {
+    if ( currentLevel + 1 < LEVEL_MAX ) {
+      setLevel( ++ currentLevel );
+      resetBall();
+    }
   }
 }
 
