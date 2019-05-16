@@ -1,4 +1,5 @@
 #include <Gamebuino-Meta.h>
+#include "Level.h"
 
 int SCREEN_WIDTH = 80;
 int SCREEN_HEIGHT = 64;    
@@ -28,6 +29,11 @@ int padPosY;
 
 int bricks[GRID_HEIGHT][GRID_WIDTH];
 
+Level *levelSpeed[LEVEL_MAX] = {
+  new Level(1),
+  new Level(2)
+};
+
 int levels[LEVEL_MAX][GRID_HEIGHT][GRID_WIDTH] = {
   { // Level 1
     { 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -44,7 +50,7 @@ int levels[LEVEL_MAX][GRID_HEIGHT][GRID_WIDTH] = {
     { 1, 1, 1, 1, 1, 1, 1, 1 },
     { 0, 0, 0, 0, 0, 0, 0, 0 },
     { 1, 1, 1, 1, 1, 1, 1, 1 }
-  }
+  },
 };
 
 void setLevel( int levelNb ) {
@@ -153,8 +159,8 @@ void runGame() {
     posY = padPosY - BALL_RADIUS;
     
     if (gb.buttons.pressed(BUTTON_A)) {
-      speedY = -1;
-      speedX = rand() > 0.5 ? -1 : 1;
+      speedY = -levelSpeed[ currentLevel ]->ballSpeed;
+      speedX = rand() % 2  > 0 ? -levelSpeed[ currentLevel ]->ballSpeed : levelSpeed[ currentLevel ]->ballSpeed;
       ballLaunched = true;
     }
   }
