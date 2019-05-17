@@ -28,6 +28,7 @@ int ballSpeed;
 bool ballLaunched;
 int padPosX;
 int padPosY;
+int combo;
 
 int bricks[GRID_HEIGHT][GRID_WIDTH];
 
@@ -118,6 +119,7 @@ void resetBall() {
     speedX = 0;
     speedY = 0;
 
+  combo = 0;
     ballLaunched = false;
 }
 
@@ -221,10 +223,14 @@ void runGame() {
     case 'A' :
       posY = padPosY - ( padPosY - ( posY + BALL_RADIUS ) ) - BALL_RADIUS;
       speedY = -speedY;
+      combo = 0;
+      gb.sound.tone(300, 100);
       break;
     case 'L' :
     case 'R' :
       speedX = -speedX;
+      combo = 0;
+      gb.sound.tone(300, 100);
       break;
     default:
       if ( posY + BALL_RADIUS > SCREEN_HEIGHT ) {
@@ -260,11 +266,14 @@ void runGame() {
           case 'U' : 
             speedY = -speedY;
             bricks[lineNb][brickNb]--;
+            combo++;
+            gb.sound.tone( 500 + 100 * combo, 100 );
             break;
           case 'L' :
           case 'R' :
             speedX = -speedX;
             bricks[lineNb][brickNb]--;
+            gb.sound.tone( 500 + 100 * combo, 100 );
             break;
         }
      }
