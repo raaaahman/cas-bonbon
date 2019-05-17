@@ -17,6 +17,7 @@ int screen = 0;
 const int SCREEN_MENU = 0;
 const int SCREEN_GAME = 1;
 const int SCREEN_GAME_OVER = 2;
+const int SCREEN_GAME_WON = 3;
 
 int currentLevel;
 int lives;
@@ -291,6 +292,8 @@ void runGame() {
     if ( currentLevel + 1 < LEVEL_MAX ) {
       setLevel( ++currentLevel );
       resetBall();
+    } else {
+      screen = SCREEN_GAME_WON;
     }
     
   }
@@ -300,6 +303,8 @@ void runGame() {
     if ( currentLevel + 1 < LEVEL_MAX ) {
       setLevel( ++ currentLevel );
       resetBall();
+    } else {
+      screen = SCREEN_GAME_WON;
     }
   }
 }
@@ -338,6 +343,9 @@ void loop() {
     case SCREEN_GAME_OVER :
       gameOver();
       break;
+    case SCREEN_GAME_WON :
+      gameWon();
+      break;
     case SCREEN_MENU :
     default : 
       mainMenu();
@@ -345,3 +353,21 @@ void loop() {
   }
 
 }
+
+void gameWon() {
+  gb.display.setCursorX(10);
+  gb.display.setCursorY(20);
+  gb.display.setFontSize(2);
+  gb.display.setColor(PURPLE);
+  gb.display.printf("You WON!\n\n");
+
+  gb.display.setFontSize(1);
+  gb.display.setCursorX(2);
+  gb.display.setColor(WHITE);
+  gb.display.printf("Play again? Press A");
+
+  if (gb.buttons.pressed(BUTTON_A)) {
+    startGame();
+  }
+}
+
