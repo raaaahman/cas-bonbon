@@ -5,7 +5,7 @@ A classic wall breaker game remade in C++ for the GameBuino console
 ## How to play
 
 ### Goal
-break all the bricks to go to further levels
+Break all the bricks to go to further levels
 
 ### Controls : 
 - `Right` and `Left` move the paddle
@@ -18,5 +18,5 @@ break all the bricks to go to further levels
 - Classical sounds : one for the paddle and a combo one for the collisions
 
 ## Credits
-Sylvain Schellenberger
-Carole Astier
+- Sylvain Schellenberger
+- Carole Astier
