@@ -9,9 +9,10 @@ int PADDLE_WIDTH = 14;
 int PADDLE_HEIGHT = 3;
 int BRICK_WIDTH = 8;
 int BRICK_HEIGHT = 4;
+const Color BRICK_COLORS[3] = { PINK, GREEN, BLUE };
 const int GRID_WIDTH = 8;
 const int GRID_HEIGHT = 6;
-const int LEVEL_MAX = 2;
+const int LEVEL_MAX = 4;
 int screen = 0;
 const int SCREEN_MENU = 0;
 const int SCREEN_GAME = 1;
@@ -31,6 +32,8 @@ int bricks[GRID_HEIGHT][GRID_WIDTH];
 
 Level *levelSpeed[LEVEL_MAX] = {
   new Level(1),
+  new Level(1),
+  new Level(2),
   new Level(2)
 };
 
@@ -51,6 +54,22 @@ int levels[LEVEL_MAX][GRID_HEIGHT][GRID_WIDTH] = {
     { 0, 0, 0, 0, 0, 0, 0, 0 },
     { 1, 1, 1, 1, 1, 1, 1, 1 }
   },
+  { //Level 3
+    { 0, 0, 0, 1, 1, 0, 0, 0 },
+    { 0, 0, 1, 0, 0, 1, 0, 0 },
+    { 0, 1, 0, 0, 0, 0, 1, 0 },
+    { 1, 0, 0, 0, 0, 0, 0, 1 },
+    { 0, 1, 0, 0, 0, 0, 1, 0 },
+    { 0, 0, 1, 0, 0, 1, 0, 0 },
+  },
+  { //Level 4
+    { 0, 0, 2, 2, 2, 2, 0, 0 },
+    { 1, 1, 1, 1, 1, 1, 1, 1 },
+    { 2, 2, 1, 1, 1, 1, 2, 2 },
+    { 2, 2, 2, 2, 2, 2, 2, 2 },
+    { 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0 },
+  }
 };
 
 void setLevel( int levelNb ) {
@@ -208,24 +227,24 @@ void runGame() {
       int brickX =  1 + brickNb * ( 2 + BRICK_WIDTH );
       int brickY = GUI_HEIGHT + lineNb * ( 2 + BRICK_HEIGHT );
       
-      if ( bricks[lineNb][brickNb] == 1 ) {
+      if ( bricks[lineNb][brickNb] > 0 ) {
         switch ( checkCollision( brickX, brickY, BRICK_WIDTH, BRICK_HEIGHT ) ) {
           case 'A' :
           case 'U' : 
             speedY = -speedY;
-            bricks[lineNb][brickNb] = 0;
+            bricks[lineNb][brickNb]--;
             break;
           case 'L' :
           case 'R' :
             speedX = -speedX;
-            bricks[lineNb][brickNb] = 0;
+            bricks[lineNb][brickNb]--;
             break;
         }
      }
 
-     if ( bricks[lineNb][brickNb] == 1 ) {
+     if ( bricks[lineNb][brickNb] > 0 ) {
       remaining = true;
-      gb.display.setColor(PINK);
+      gb.display.setColor(BRICK_COLORS[bricks[lineNb][brickNb] - 1]);
       gb.display.fillRoundRect( brickX, brickY, BRICK_WIDTH, BRICK_HEIGHT, BRICK_HEIGHT / 2 );
     }
     
