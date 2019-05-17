@@ -8,7 +8,7 @@ int PADDLE_WIDTH = 14;
 int PADDLE_HEIGHT = 3;
 int BRICK_WIDTH = 8;
 int BRICK_HEIGHT = 4;
-const Color BRICK_COLORS[3] = { WHITE, GREEN, BLUE };
+const Color BRICK_COLORS[3] = { PINK, GREEN, BLUE };
 const int GRID_WIDTH = 8;
 const int GRID_HEIGHT = 6;
 const int LEVEL_MAX = 5;
@@ -129,7 +129,7 @@ void mainMenu() {
 void runGame() {
   gb.display.setFontSize(1);
   gb.display.printf( "Lives %i", lives);
-  gb.display.setCursorX( 40 );
+  gb.display.setCursorX( 50 );
   gb.display.printf( "Level %i", currentLevel + 1);
   // THE PADDLE
   if (gb.buttons.pressed(BUTTON_RIGHT)) {  // If we press RIGHT
