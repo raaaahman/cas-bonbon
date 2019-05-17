@@ -12,7 +12,7 @@ int BRICK_HEIGHT = 4;
 const Color BRICK_COLORS[3] = { PINK, GREEN, BLUE };
 const int GRID_WIDTH = 8;
 const int GRID_HEIGHT = 6;
-const int LEVEL_MAX = 4;
+const int LEVEL_MAX = 5;
 int screen = 0;
 const int SCREEN_MENU = 0;
 const int SCREEN_GAME = 1;
@@ -24,18 +24,30 @@ int posX;
 int posY;
 int speedX;
 int speedY;
+int ballSpeed;
 bool ballLaunched;
 int padPosX;
 int padPosY;
 
 int bricks[GRID_HEIGHT][GRID_WIDTH];
 
-Level *levelSpeed[LEVEL_MAX] = {
+Level *levelDifficulty[LEVEL_MAX] = {
+  new Level(0),
   new Level(1),
   new Level(1),
   new Level(2),
   new Level(2)
 };
+
+int adaptBallSpeed( int currentSpeed, int levelDifficulty ) {
+  if ( levelDifficulty > 0 && lives == 3 ) {
+    currentSpeed++;
+  } else if ( lives == 1 && currentSpeed > 1 ) {
+    currentSpeed--;
+  }
+
+  return currentSpeed;
+}
 
 int levels[LEVEL_MAX][GRID_HEIGHT][GRID_WIDTH] = {
   { // Level 1
@@ -69,10 +81,20 @@ int levels[LEVEL_MAX][GRID_HEIGHT][GRID_WIDTH] = {
     { 2, 2, 2, 2, 2, 2, 2, 2 },
     { 0, 0, 0, 0, 0, 0, 0, 0 },
     { 0, 0, 0, 0, 0, 0, 0, 0 },
+  },
+  { // Level 5
+    { 1, 1, 0, 0, 0, 0, 1, 1 },
+    { 1, 1, 2, 2, 2, 2, 1, 1 },
+    { 2, 2, 3, 3, 3, 3, 2, 2 },
+    { 1, 1, 2, 2, 2, 2, 1, 1 },
+    { 1, 1, 0, 0, 0, 0, 1, 1 },
+    { 0, 0, 0, 0, 0, 0, 0, 0 },
   }
 };
 
 void setLevel( int levelNb ) {
+  ballSpeed = adaptBallSpeed( ballSpeed, levelDifficulty[currentLevel]->difficulty );
+      
   for ( int lineNb = 0; lineNb < GRID_HEIGHT; lineNb++ ) {
     for ( int brickNb = 0; brickNb < GRID_WIDTH; brickNb++) {
       bricks[lineNb][brickNb] = levels[levelNb][lineNb][brickNb];
@@ -83,6 +105,7 @@ void setLevel( int levelNb ) {
 void resetGame() {
   lives = 3;
   currentLevel = 0;
+  ballSpeed = 1;
 }
 
 void resetBall() {
@@ -178,8 +201,8 @@ void runGame() {
     posY = padPosY - BALL_RADIUS;
     
     if (gb.buttons.pressed(BUTTON_A)) {
-      speedY = -levelSpeed[ currentLevel ]->ballSpeed;
-      speedX = rand() % 2  > 0 ? -levelSpeed[ currentLevel ]->ballSpeed : levelSpeed[ currentLevel ]->ballSpeed;
+      speedY = -ballSpeed;
+      speedX = rand() % 2  > 0 ? ballSpeed : -ballSpeed;
       ballLaunched = true;
     }
   }
@@ -205,8 +228,12 @@ void runGame() {
       break;
     default:
       if ( posY + BALL_RADIUS > SCREEN_HEIGHT ) {
-        if ( --lives == 0 ) {
+        lives--;
+        if ( lives == 0 ) {
           screen = SCREEN_GAME_OVER;
+        } else if ( lives == 1) {
+          ballSpeed = adaptBallSpeed( ballSpeed, levelDifficulty[currentLevel]->difficulty );
+          resetBall();
         } else {
           resetBall();
         }

@@ -1,6 +1,6 @@
 class Level {
   public:
-    int ballSpeed;
-    Level(int setBallSpeed);
+    int difficulty;
+    Level(int levelDifficulty);
 };
 
