@@ -1,5 +1,4 @@
 #include <Gamebuino-Meta.h>
-#include "Level.h"
 
 int SCREEN_WIDTH = 80;
 int SCREEN_HEIGHT = 64;    
@@ -9,7 +8,7 @@ int PADDLE_WIDTH = 14;
 int PADDLE_HEIGHT = 3;
 int BRICK_WIDTH = 8;
 int BRICK_HEIGHT = 4;
-const Color BRICK_COLORS[3] = { PINK, GREEN, BLUE };
+const Color BRICK_COLORS[3] = { WHITE, GREEN, BLUE };
 const int GRID_WIDTH = 8;
 const int GRID_HEIGHT = 6;
 const int LEVEL_MAX = 5;
@@ -18,6 +17,9 @@ const int SCREEN_MENU = 0;
 const int SCREEN_GAME = 1;
 const int SCREEN_GAME_OVER = 2;
 const int SCREEN_GAME_WON = 3;
+
+#include "Level.h"
+#include "levels.h"
 
 int currentLevel;
 int lives;
@@ -33,14 +35,6 @@ int combo;
 
 int bricks[GRID_HEIGHT][GRID_WIDTH];
 
-Level *levelDifficulty[LEVEL_MAX] = {
-  new Level(0),
-  new Level(1),
-  new Level(1),
-  new Level(2),
-  new Level(2)
-};
-
 int adaptBallSpeed( int currentSpeed, int levelDifficulty ) {
   if ( levelDifficulty > 0 && lives == 3 ) {
     currentSpeed++;
@@ -51,55 +45,12 @@ int adaptBallSpeed( int currentSpeed, int levelDifficulty ) {
   return currentSpeed;
 }
 
-int levels[LEVEL_MAX][GRID_HEIGHT][GRID_WIDTH] = {
-  { // Level 1
-    { 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 1, 1, 1, 1, 1, 1, 1, 1 },
-    { 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0 }
-  },
-  { // Level 2
-    { 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 1, 1, 1, 1, 1, 1, 1, 1 },
-    { 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 1, 1, 1, 1, 1, 1, 1, 1 }
-  },
-  { //Level 3
-    { 0, 0, 0, 1, 1, 0, 0, 0 },
-    { 0, 0, 1, 0, 0, 1, 0, 0 },
-    { 0, 1, 0, 0, 0, 0, 1, 0 },
-    { 1, 0, 0, 0, 0, 0, 0, 1 },
-    { 0, 1, 0, 0, 0, 0, 1, 0 },
-    { 0, 0, 1, 0, 0, 1, 0, 0 },
-  },
-  { //Level 4
-    { 0, 0, 2, 2, 2, 2, 0, 0 },
-    { 1, 1, 1, 1, 1, 1, 1, 1 },
-    { 2, 2, 1, 1, 1, 1, 2, 2 },
-    { 2, 2, 2, 2, 2, 2, 2, 2 },
-    { 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0 },
-  },
-  { // Level 5
-    { 1, 1, 0, 0, 0, 0, 1, 1 },
-    { 1, 1, 2, 2, 2, 2, 1, 1 },
-    { 2, 2, 3, 3, 3, 3, 2, 2 },
-    { 1, 1, 2, 2, 2, 2, 1, 1 },
-    { 1, 1, 0, 0, 0, 0, 1, 1 },
-    { 0, 0, 0, 0, 0, 0, 0, 0 },
-  }
-};
-
 void setLevel( int levelNb ) {
-  ballSpeed = adaptBallSpeed( ballSpeed, levelDifficulty[currentLevel]->difficulty );
+  ballSpeed = adaptBallSpeed( ballSpeed, levels[currentLevel].difficulty );
       
   for ( int lineNb = 0; lineNb < GRID_HEIGHT; lineNb++ ) {
     for ( int brickNb = 0; brickNb < GRID_WIDTH; brickNb++) {
-      bricks[lineNb][brickNb] = levels[levelNb][lineNb][brickNb];
+      bricks[lineNb][brickNb] = levels[levelNb].grid[lineNb][brickNb];
     }
   } 
 }
@@ -239,7 +190,7 @@ void runGame() {
         if ( lives == 0 ) {
           screen = SCREEN_GAME_OVER;
         } else if ( lives == 1) {
-          ballSpeed = adaptBallSpeed( ballSpeed, levelDifficulty[currentLevel]->difficulty );
+          ballSpeed = adaptBallSpeed( ballSpeed, levels[currentLevel].difficulty );
           resetBall();
         } else {
           resetBall();
